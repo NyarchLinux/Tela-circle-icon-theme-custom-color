@@ -8,11 +8,12 @@ fi
 
 readonly SRC_DIR=$(cd $(dirname $0) && pwd)
 
+readonly COLOR_VARIANTS=("standard" "black" "blue" "brown" "green" "grey" "orange" "pink" "purple" "red" "yellow" "manjaro" "ubuntu" "dracula" "nord")
 readonly BRIGHT_VARIANTS=("" "light" "dark")
 
 if command -v lsb_release &> /dev/null; then
   Distributor_ID=$(lsb_release -i)
-  if [[ "${Distributor_ID}" == "Distributor ID:    elementary" || "${Distributor_ID}" == "Distributor ID:    Elementary" ]]; then
+  if [[ "${Distributor_ID}" == "Distributor ID:	elementary" || "${Distributor_ID}" == "Distributor ID:	Elementary" ]]; then
     ICON_VERSION="elementary"
   else
     ICON_VERSION="normal"
@@ -23,8 +24,8 @@ else
 fi
 
 usage() {
-  cat << EOF
-Usage: $0 [OPTION] | [HEX_COLOR]...
+cat << EOF
+Usage: $0 [OPTION] | [COLOR VARIANTS]...
 
 OPTIONS:
   -a                       Install all color folder versions
@@ -33,15 +34,80 @@ OPTIONS:
   -n NAME                  Specify theme name (Default: Tela-circle)
   -h                       Show this help
 
-HEX_COLOR:
-  Specify the hex color code for the theme.
+COLOR VARIANTS:
+  standard                 Standard color folder version
+  black                    Black color folder version
+  blue                     Blue color folder version
+  brown                    Brown color folder version
+  green                    Green color folder version
+  grey                     Grey color folder version
+  orange                   Orange color folder version
+  pink                     Pink color folder version
+  purple                   Purple color folder version
+  red                      Red color folder version
+  yellow                   Yellow color folder version
+  manjaro                  Manjaro default color folder version
+  ubuntu                   Ubuntu default color folder version
+  dracula                  Dracula default color folder version
+  nord                     nord color folder version
 
   By default, only the standard one is selected.
 EOF
 }
 
 install_theme() {
-  local -r hex_color="$1"
+  case "$1" in
+    standard)
+      local -r theme_color='#5294e2'
+      ;;
+    black)
+      local -r theme_color='#4d4d4d'
+      ;;
+    blue)
+      local -r theme_color='#5677fc'
+      ;;
+    brown)
+      local -r theme_color='#FFFFFF'
+      ;;
+    green)
+      local -r theme_color='#66bb6a'
+      ;;
+    grey)
+      local -r theme_color='#bdbdbd'
+      ;;
+    orange)
+      local -r theme_color='#ff9800'
+      ;;
+    pink)
+      local -r theme_color='#f06292'
+      ;;
+    purple)
+      local -r theme_color='#7e57c2'
+      ;;
+    red)
+      local -r theme_color='#ef5350'
+      ;;
+    yellow)
+      local -r theme_color='#ffca28'
+      ;;
+    manjaro)
+      local -r theme_color='#16a085'
+      ;;
+    ubuntu)
+      local -r theme_color='#fb8441'
+      ;;
+    dracula)
+      local -r theme_color='#44475a'
+      ;;
+    nord)
+      local -r theme_color='#4d576a'
+      ;;
+  esac
+
+  # Appends a dash if the variables are not empty
+  if [[ "$1" != "standard" ]]; then
+    local -r colorprefix="-$1"
+  fi
 
   if [[ "${circle}" == 'true' ]]; then
     local -r folderstyle="-circle"
@@ -51,7 +117,7 @@ install_theme() {
 
   local -r brightprefix="${2:+-$2}"
 
-  local -r THEME_NAME="${hex_color}-${NAME}${brightprefix}"
+  local -r THEME_NAME="${NAME}${colorprefix}${brightprefix}"
   local -r THEME_DIR="${DEST_DIR}/${THEME_NAME}"
 
   if [ -d "${THEME_DIR}" ]; then
@@ -73,9 +139,27 @@ install_theme() {
     cp -r "${SRC_DIR}"/src/scalable/{apps,devices,mimetypes}                     "${THEME_DIR}/scalable"
     cp -r "${SRC_DIR}"/src/scalable/places${folderstyle}                         "${THEME_DIR}/scalable/places"
 
-    sed -i "s/#5294e2/${hex_color}/g" "${THEME_DIR}/scalable/apps/"*.svg "${THEME_DIR}/scalable/places/"default-*.svg "${THEME_DIR}/16/places/"folder*.svg
-    sed -i "/\ColorScheme-Highlight/s/currentColor/${hex_color}/" "${THEME_DIR}/scalable/places/"default-*.svg "${THEME_DIR}/16/places/"folder*.svg
-    sed -i "/\ColorScheme-Background/s/currentColor/#ffffff/" "${THEME_DIR}/scalable/places/"default-*.svg
+    if [[ "$1" != "standard" ]]; then
+      sed -i "s/#5294e2/${theme_color}/g" "${THEME_DIR}/scalable/apps/"*.svg "${THEME_DIR}/scalable/places/"default-*.svg "${THEME_DIR}/16/places/"folder*.svg
+      sed -i "/\ColorScheme-Highlight/s/currentColor/${theme_color}/" "${THEME_DIR}/scalable/places/"default-*.svg "${THEME_DIR}/16/places/"folder*.svg
+      sed -i "/\ColorScheme-Background/s/currentColor/#ffffff/" "${THEME_DIR}/scalable/places/"default-*.svg
+
+      if [[ "$1" == "dracula" ]]; then
+        sed -i '/\id="shadow"/s/#000000/#bd93f9/' "${THEME_DIR}/scalable/apps/"*.svg "${THEME_DIR}/scalable/places/"default-*.svg
+        sed -i '/\id="shadow"/s/ opacity=".2"//' "${THEME_DIR}/scalable/apps/"*.svg "${THEME_DIR}/scalable/places/"default-*.svg
+        sed -i '/\id="bottom_layer"/s/#44475a/#bd93f9/' "${THEME_DIR}/16/places/"folder*.svg
+        sed -i '/\id="bottom_layer"/s/ opacity="0.5"//' "${THEME_DIR}/16/places/"folder*.svg
+        sed -i "s/color:#ffffff/color:#f8f8f2/g" "${THEME_DIR}/scalable/places/"default-*.svg
+        sed -i "s/${theme_color}/#dd86e0/g" "${THEME_DIR}/scalable/places/"default-user-desktop.svg
+        sed -i '/\id="highlight"/s/opacity=".25"/opacity="0"/' "${THEME_DIR}/scalable/places/"default-user-desktop.svg
+        sed -i "s/#5294e2/#bd93f9/g" "${THEME_DIR}/scalable/devices/"*.svg "${THEME_DIR}/32/devices/"*.svg
+      elif [[ "$1" == "grey" ]]; then
+        sed -i "s/color:#ffffff/color:#666666/g" "${THEME_DIR}/scalable/places/"default-*.svg
+        sed -i "s/#5294e2/#666666/g" "${THEME_DIR}/scalable/devices/"*.svg "${THEME_DIR}/32/devices/"*.svg
+      else
+        sed -i "s/#5294e2/${theme_color}/g" "${THEME_DIR}/scalable/devices/"*.svg "${THEME_DIR}/32/devices/"*.svg
+      fi
+    fi
 
     cp -r "${SRC_DIR}"/links/{16,22,24,32,scalable,symbolic}                     "${THEME_DIR}"
 
@@ -136,6 +220,15 @@ install_theme() {
     sed -i "s/#727272/#aaaaaa/g" "${THEME_DIR}"/{16,22,24}/{places,devices}/*.svg
     sed -i "s/#555555/#aaaaaa/g" "${THEME_DIR}"/symbolic/{actions,apps,categories,devices,emblems,emotes,mimetypes,places,status}/*.svg
 
+    if [[ "$1" != "standard" ]]; then
+      sed -i "s/#5294e2/${theme_color}/g" "${THEME_DIR}/16/places/"folder*.svg
+
+      if [[ "$1" == "dracula" ]]; then
+        sed -i '/\id="bottom_layer"/s/currentColor/#bd93f9/' "${THEME_DIR}/16/places/"folder*.svg
+        sed -i '/\id="bottom_layer"/s/ opacity="0.5"//' "${THEME_DIR}/16/places/"folder*.svg
+      fi
+    fi
+
     cp -r "${SRC_DIR}"/links/16/{actions,devices,places}                         "${THEME_DIR}/16"
     cp -r "${SRC_DIR}"/links/22/{actions,devices,places}                         "${THEME_DIR}/22"
     cp -r "${SRC_DIR}"/links/24/{actions,devices,places}                         "${THEME_DIR}/24"
@@ -166,7 +259,7 @@ install_theme() {
 
 while [ $# -gt 0 ]; do
   if [[ "$1" = "-a" ]]; then
-    colors=("standard")
+    colors=("${COLOR_VARIANTS[@]}")
   elif [[ "$1" = "-c" ]]; then
     circle="true"
     echo -e "Install circular folder version! ..."
@@ -179,8 +272,14 @@ while [ $# -gt 0 ]; do
   elif [[ "$1" = "-h" ]]; then
     usage
     exit 0
+  # If the argument is a color variant, append it to the colors to be installed
+  elif [[ " ${COLOR_VARIANTS[*]} " = *" $1 "* ]] && \
+       [[ "${colors[*]}" != *$1* ]]; then
+    colors+=("$1")
   else
-    colors=("$1")
+    echo "ERROR: Unrecognized installation option '$1'."
+    echo "Try '$0 -h' for more information."
+    exit 1
   fi
 
   shift
@@ -189,11 +288,9 @@ done
 # Default name is 'Tela-circle'
 : "${NAME:=Tela-circle}"
 
-
 # By default, only the standard color variant is selected
-for color in "${colors[@]}"; do
+for color in "${colors[@]:-standard}"; do
   for bright in "${BRIGHT_VARIANTS[@]}"; do
     install_theme "${color}" "${bright}"
   done
 done
-
