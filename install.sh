@@ -27,16 +27,12 @@ usage() {
 Usage: $0 [OPTION] | [HEX_COLOR]...
 
 OPTIONS:
-  -a                       Install all color folder versions
+  -a"#hex-color" 	installs the themes with the given hex value, this will happend the hex to the begining of the folder name don't forget the quotations marks nor the #
   -c                       Install circular folder version
   -d DIR                   Specify theme destination directory (Default: $HOME/.local/share/icons)
   -n NAME                  Specify theme name (Default: Tela-circle)
   -h                       Show this help
 
-HEX_COLOR:
-  Specify the hex color code for the theme.
-
-  By default, only the standard one is selected.
 EOF
 }
 
