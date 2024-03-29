@@ -8,7 +8,7 @@ fi
 
 readonly SRC_DIR=$(cd $(dirname $0) && pwd)
 
-readonly BRIGHT_VARIANTS=("" "light" "dark")
+readonly BRIGHT_VARIANTS=("")
 
 if command -v lsb_release &> /dev/null; then
   Distributor_ID=$(lsb_release -i)
