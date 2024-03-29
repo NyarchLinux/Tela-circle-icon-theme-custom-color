@@ -47,7 +47,7 @@ install_theme() {
 
   local -r brightprefix="${2:+-$2}"
 
-  local -r THEME_NAME="${hex_color}-${NAME}${brightprefix}"
+  local -r THEME_NAME="${NAME}${brightprefix}"
   local -r THEME_DIR="${DEST_DIR}/${THEME_NAME}"
 
   if [ -d "${THEME_DIR}" ]; then
